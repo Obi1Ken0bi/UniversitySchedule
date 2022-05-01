@@ -1,0 +1,31 @@
+package ru.puzikov.universityschedule.model;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+
+@NoArgsConstructor
+@Entity
+@Getter
+@Setter
+public class Room {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "room_gen")
+    @SequenceGenerator(name = "room_gen", sequenceName = "room_seq", allocationSize = 1)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "building_id")
+    private Building building;
+
+    private String number;
+
+
+    public Room(Building building, String number) {
+        this.building = building;
+        this.number = number;
+    }
+}
