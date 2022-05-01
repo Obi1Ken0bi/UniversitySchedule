@@ -30,7 +30,7 @@ public class UniversityScheduleApplication {
 
     public CommandLineRunner runner() {
         return args -> {
-            if(needToUpdate) {
+            if (needToUpdate) {
                 Site site = Site.builder()
                         .groupClass("gr")
                         .groupsUrl("https://www.smtu.ru/ru/listschedule/")
@@ -43,7 +43,7 @@ public class UniversityScheduleApplication {
                 }
                 Group group = parser.parseScheduleForGroup(site, 20391);
                 log.info(group.toString());
-            }else
+            } else
                 log.info("No update needed");
 
         };

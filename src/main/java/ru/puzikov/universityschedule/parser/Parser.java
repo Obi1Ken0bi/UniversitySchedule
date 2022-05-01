@@ -81,11 +81,9 @@ public class Parser {
         Room roomToCreate = Room.builder().building(building).number(room).build();
         roomToCreate = roomService.saveOrGet(roomToCreate);
         Teacher teacher1;
-        if(s.length==2){
-            teacher1= Teacher.builder().surname(s[0]).name(s[1]).build();
-        }
-        else
-        if (!teacher.isEmpty()) {
+        if (s.length == 2) {
+            teacher1 = Teacher.builder().surname(s[0]).name(s[1]).build();
+        } else if (!teacher.isEmpty()) {
             teacher1 = Teacher.builder().surname(s[0]).name(s[1]).patronymic(s[2]).build();
         } else {
             teacher1 = Teacher.builder().surname("").name("").patronymic("").build();

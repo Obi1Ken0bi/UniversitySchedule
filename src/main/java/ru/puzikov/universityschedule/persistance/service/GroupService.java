@@ -27,19 +27,18 @@ public class GroupService {
         return repository.findByNumber(group.getNumber()).get();
     }
 
-    public Pair getNextPair(Group group){
-        Pair pairToReturn=null;
+    public Pair getNextPair(Group group) {
+        Pair pairToReturn = null;
         Group group1 = repository.findByNumber(group.getNumber()).get();
-        LocalTime time=LocalTime.now();
+        LocalTime time = LocalTime.now();
         List<Day> days = group1.getSchedule().getDays();
         int i = LocalDate.now().getDayOfWeek().getValue() - 1;
-        i=0;
         DayOfWeek dayOfWeek = DayOfWeek.getDayOfWeek(i);
         for (int j = 0; j < days.size(); j++) {
             Day day = days.get(i);
-            if(day.getDayOfWeek().equals(dayOfWeek)){
+            if (day.getDayOfWeek().equals(dayOfWeek)) {
                 List<Pair> pairs = day.getPairs();
-                int min=Integer.MAX_VALUE;
+                int min = Integer.MAX_VALUE;
                 for (Pair pair : pairs) {
                     int range = pair.getTime().toSecondOfDay() - time.toSecondOfDay();
                     if (range < min) {
