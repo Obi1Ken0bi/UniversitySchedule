@@ -14,8 +14,12 @@ public enum DayOfWeek {
 
     private final String representation;
 
-    public static DayOfWeek getDayOfWeek(int i){
-        switch (i){
+    DayOfWeek(String representation) {
+        this.representation = representation;
+    }
+
+    public static DayOfWeek getDayOfWeek(int i) {
+        switch (i) {
             case 0:
                 return MONDAY;
             case 1:
@@ -31,9 +35,5 @@ public enum DayOfWeek {
 
         }
         return null;
-    }
-
-    DayOfWeek(String representation) {
-        this.representation = representation;
     }
 }

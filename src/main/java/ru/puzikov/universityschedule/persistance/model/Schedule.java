@@ -10,8 +10,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Builder
-@ToString
 @NoArgsConstructor
+@ToString
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedule_gen")
@@ -20,9 +20,12 @@ public class Schedule {
     private Long id;
 
     @OneToMany
+    @ToString.Exclude
     private List<Day> days;
 
     public Schedule(List<Day> days) {
         this.days = days;
     }
+
+
 }

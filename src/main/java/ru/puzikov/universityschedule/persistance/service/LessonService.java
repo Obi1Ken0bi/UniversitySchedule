@@ -14,8 +14,14 @@ public class LessonService {
     }
 
     public Lesson saveOrGet(Lesson lesson) {
-        if (repository.findByRoomAndTeacherAndSubject(lesson.getRoom(), lesson.getTeacher(), lesson.getSubject()).isEmpty())
+        if (repository.findByRoomAndTeacherAndSubject(lesson.getRoom(),
+                lesson.getTeacher(),
+                lesson.getSubject())
+                .isEmpty())
             return repository.save(lesson);
-        return repository.findByRoomAndTeacherAndSubject(lesson.getRoom(), lesson.getTeacher(), lesson.getSubject()).get();
+        return repository.findByRoomAndTeacherAndSubject(lesson.getRoom(),
+                lesson.getTeacher(),
+                lesson.getSubject())
+                .get();
     }
 }

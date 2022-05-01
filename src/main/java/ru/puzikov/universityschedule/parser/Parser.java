@@ -12,6 +12,7 @@ import ru.puzikov.universityschedule.persistance.service.*;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,7 +57,6 @@ public class Parser {
         Elements groups = document.select("div.gr");
         for (Element group : groups) {
             groupNames.add(group.text());
-
         }
         return groupNames;
     }
@@ -74,21 +74,17 @@ public class Parser {
         char buildLetter = buildingRoom.trim().toLowerCase(Locale.ROOT).charAt(0);
         String room = buildingRoom.substring(2).trim();
         String[] s = teacher.split(" ");
-//        log.info("Time: "+time);
-//        log.info("Week type: "+weekType);
-//        log.info("Building: "+buildLetter);
-//        log.info("Room: "+room);
-//        log.info("Subject: "+subj);
-//        log.info("Type: "+type);
-//        log.info("Teacher: "+teacher);
         String firstTime = time.substring(0, 5);
         LocalTime localTime = LocalTime.parse(firstTime);
-        //log.info("Start time: "+localTime);
         Building building = Building.builder().letter(buildLetter).build();
         building = buildingService.saveOrGet(building);
         Room roomToCreate = Room.builder().building(building).number(room).build();
         roomToCreate = roomService.saveOrGet(roomToCreate);
         Teacher teacher1;
+        if(s.length==2){
+            teacher1= Teacher.builder().surname(s[0]).name(s[1]).build();
+        }
+        else
         if (!teacher.isEmpty()) {
             teacher1 = Teacher.builder().surname(s[0]).name(s[1]).patronymic(s[2]).build();
         } else {
@@ -110,30 +106,36 @@ public class Parser {
     public Group parseScheduleForGroup(Site site, int groupNumber) {
         Document document = Jsoup.connect(site.getUrlForGroup(groupNumber)).get();
         Elements daysElems = document.select("tbody");
-        Group group=new Group(groupNumber);
-        Schedule schedule = Schedule.builder().days(new ArrayList<Day>()).build();
+        Group group = new Group(groupNumber);
+        Schedule schedule = Schedule.builder().days(new ArrayList<>()).build();
         for (int j = 0; j < daysElems.size(); j++) {
             Element dayElem = daysElems.get(j);
             if (dayElem.text().equals("")) continue;
-            Day day = Day.builder().dayOfWeek(DayOfWeek.getDayOfWeek(j)).pairs(new ArrayList<Pair>()).build();
-            //log.info(dayElem.text());
+            Day day = Day.builder().dayOfWeek(DayOfWeek.getDayOfWeek(j - 1)).pairs(new ArrayList<>()).build();
             Elements pairElems = dayElem.select("tr");
-            //  for (Element pairElem:pairElems){
-            for (int i = 0; i < pairElems.size(); i++) {
+            for (int i = 0; i < pairElems.size() - 1; i++) {
                 Pair pair = parsePair(pairElems.get(i));
+                Pair nextPair = parsePair(pairElems.get(i + 1));
+                if (pair.getTime().equals(nextPair.getTime())) {
+                    pair.setDownLesson(nextPair.getUpperLesson());
+                    i++;
+                } else {
+                    if (i + 1 == pairElems.size() - 1) {
+                        nextPair = pairService.saveOrGet(nextPair);
+                        day.getPairs().add(nextPair);
+                    }
+                }
                 pair = pairService.saveOrGet(pair);
-                log.info(pair.toString());
                 day.getPairs().add(pair);
-
-
             }
-            day=dayService.save(day);
+            day.getPairs().sort(Comparator.comparingInt(x -> x.getTime().getHour()));
+            day = dayService.save(day);
             schedule.getDays().add(day);
 
         }
-        schedule=scheduleService.save(schedule);
+        schedule = scheduleService.save(schedule);
         group.setSchedule(schedule);
-        group=groupService.saveOrGet(group);
+        group = groupService.saveOrGet(group);
         return group;
     }
 }

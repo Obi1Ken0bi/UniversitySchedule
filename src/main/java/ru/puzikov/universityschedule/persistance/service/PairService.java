@@ -20,6 +20,10 @@ public class PairService {
                         pair.getDownLesson())
                 .isEmpty())
             return repository.save(pair);
-        return repository.findByUpperLessonAndTimeAndDownLesson(pair.getUpperLesson(), pair.getTime(), pair.getDownLesson()).get();
+        return repository
+                .findByUpperLessonAndTimeAndDownLesson(pair.getUpperLesson(),
+                        pair.getTime(),
+                        pair.getDownLesson())
+                .get();
     }
 }

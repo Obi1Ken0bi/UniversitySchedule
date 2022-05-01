@@ -16,6 +16,9 @@ public class RoomService {
     public Room saveOrGet(Room room) {
         if (repository.findByNumberAndBuilding(room.getNumber(), room.getBuilding()).isEmpty())
             return repository.save(room);
-        return repository.findByNumberAndBuilding(room.getNumber(), room.getBuilding()).get();
+        return repository
+                .findByNumberAndBuilding(room.getNumber(),
+                        room.getBuilding())
+                .get();
     }
 }

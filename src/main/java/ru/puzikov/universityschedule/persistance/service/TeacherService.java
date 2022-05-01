@@ -18,7 +18,8 @@ public class TeacherService {
 
     public Teacher saveOrGet(Teacher teacher) {
         if (repository.existsByNameAndSurname(teacher.getName(), teacher.getSurname())) {
-            return repository.findByNameAndSurname(teacher.getName(), teacher.getSurname()).orElseThrow(RuntimeException::new);
+            return repository.findByNameAndSurname(teacher.getName(), teacher.getSurname())
+                    .orElseThrow(RuntimeException::new);
         }
         return repository.save(teacher);
     }
