@@ -33,6 +33,7 @@ public class GroupService {
         LocalTime time=LocalTime.now();
         List<Day> days = group1.getSchedule().getDays();
         int i = LocalDate.now().getDayOfWeek().getValue() - 1;
+        i=0;
         DayOfWeek dayOfWeek = DayOfWeek.getDayOfWeek(i);
         for (int j = 0; j < days.size(); j++) {
             Day day = days.get(i);
