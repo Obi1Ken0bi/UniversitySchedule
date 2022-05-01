@@ -1,11 +1,15 @@
 package ru.puzikov.universityschedule.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Building {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "building_gen")

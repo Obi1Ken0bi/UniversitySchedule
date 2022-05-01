@@ -1,8 +1,6 @@
 package ru.puzikov.universityschedule.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -11,6 +9,8 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Pair {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pair_gen")
