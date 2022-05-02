@@ -3,7 +3,6 @@ package ru.puzikov.universityschedule.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -24,15 +23,15 @@ public class Schedule {
     @ToString.Exclude
     private List<Day> days;
 
+    public Schedule(List<Day> days) {
+        this.days = days;
+    }
+
     public List<Day> getDays() {
         return days;
     }
 
     public void setDays(List<Day> days) {
-        this.days = days;
-    }
-
-    public Schedule(List<Day> days) {
         this.days = days;
     }
 

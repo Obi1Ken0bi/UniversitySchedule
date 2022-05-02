@@ -24,6 +24,9 @@ public class Group {
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "group")
+    @ToString.Exclude
+    private List<User> users;
 
     public Group(int number) {
         this.number = number;
@@ -33,10 +36,6 @@ public class Group {
         this.number = number;
         this.schedule = schedule;
     }
-
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "group")
-    @ToString.Exclude
-    private List<User> users;
 
 
 }

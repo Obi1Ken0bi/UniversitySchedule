@@ -15,6 +15,7 @@ public class PairDto {
     private Lesson lesson;
 
     private LocalTime time;
+
     @JsonIgnore
     public boolean isTimeToNotify() {
         return getTime().toSecondOfDay() - LocalTime.now().toSecondOfDay() < 600;

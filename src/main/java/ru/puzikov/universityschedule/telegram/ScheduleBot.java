@@ -1,6 +1,5 @@
 package ru.puzikov.universityschedule.telegram;
 
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,8 +14,6 @@ import ru.puzikov.universityschedule.persistence.model.Group;
 import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.service.GroupService;
 import ru.puzikov.universityschedule.persistence.service.UserServiceImpl;
-
-import javax.transaction.Transactional;
 
 @Component
 @Slf4j
@@ -74,6 +71,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
             }
         }
     }
+
     private SendMessage registerUser(String groupId, String chatId) {
         Group group = groupService.findByNumber(Integer.parseInt(groupId));
         User user = new User();

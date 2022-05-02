@@ -24,16 +24,13 @@ public class Day {
     private Long id;
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
-
-
+    @ManyToMany(mappedBy = "days")
+    private List<Schedule> schedule;
 
     public Day(DayOfWeek dayOfWeek, List<Pair> pairs) {
         this.dayOfWeek = dayOfWeek;
         this.pairs = pairs;
     }
-
-    @ManyToMany(mappedBy = "days")
-    private List<Schedule> schedule;
 
     public Collection<Schedule> getSchedule() {
         return schedule;
