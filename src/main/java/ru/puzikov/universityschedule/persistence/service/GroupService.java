@@ -31,6 +31,10 @@ public class GroupService {
         return repository.findByNumber(group.getNumber()).get();
     }
 
+    public Group findByNumber(Integer number){
+        return repository.findByNumber(number).orElseThrow(RuntimeException::new);
+    }
+
     public PairDto getNextPair(Group group) throws GroupNotFoundException {
         Pair pairToReturn = null;
         Group group1 = repository.findByNumber(group.getNumber()).orElseThrow(GroupNotFoundException::new);

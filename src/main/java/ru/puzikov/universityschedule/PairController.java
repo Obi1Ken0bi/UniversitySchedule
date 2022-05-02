@@ -1,6 +1,5 @@
 package ru.puzikov.universityschedule;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +32,7 @@ public class PairController {
     }
 
     @GetMapping("/refresh")
-    public String refresh(){
+    public String refresh() {
         parserService.refresh();
         return "Done";
     }
