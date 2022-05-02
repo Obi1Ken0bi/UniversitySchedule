@@ -15,6 +15,8 @@ import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.service.GroupService;
 import ru.puzikov.universityschedule.persistence.service.UserServiceImpl;
 
+import javax.transaction.Transactional;
+
 @Component
 @Slf4j
 public class ScheduleBot extends TelegramLongPollingBot {
@@ -93,6 +95,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
     }
 
     @Scheduled(cron = "0 0/10 * ? * MON,TUE,WED,THU,FRI,SAT")
+    @Transactional
     public void notifyUsers() {
         userService.findAll().forEach(x -> {
             try {
