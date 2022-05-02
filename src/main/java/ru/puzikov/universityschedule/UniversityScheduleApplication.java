@@ -46,8 +46,6 @@ public class UniversityScheduleApplication {
                 }
             } else
                 log.info("No update needed");
-            groupRepository.deleteAll();
-
         };
     }
 }
