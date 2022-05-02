@@ -7,8 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
-import ru.puzikov.universityschedule.persistance.model.*;
-import ru.puzikov.universityschedule.persistance.service.*;
+import ru.puzikov.universityschedule.persistence.model.*;
+import ru.puzikov.universityschedule.persistence.service.*;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
