@@ -1,5 +1,6 @@
 package ru.puzikov.universityschedule.telegram;
 
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.service.GroupService;
 import ru.puzikov.universityschedule.persistence.service.UserServiceImpl;
 
-import java.time.LocalTime;
+import javax.transaction.Transactional;
 
 @Component
 @Slf4j
@@ -45,8 +46,9 @@ public class ScheduleBot extends TelegramLongPollingBot {
     public String getBotToken() {
         return token;
     }
-    public void sendMessage(String chatId,String message){
-        SendMessage sendMessage=new SendMessage();
+
+    public void sendMessage(String chatId, String message) {
+        SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(message);
         try {
@@ -58,18 +60,12 @@ public class ScheduleBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if(update.hasMessage() && update.getMessage().hasText()) {
-            String groupId = update.getMessage().getText().trim();
-            String chatId = update.getMessage().getChatId().toString();
-
-            Group group=groupService.findByNumber(Integer.parseInt(groupId));
-            User user=new User();
-            user.setGroup(group);
-            user.setChatId(chatId);
-            SendMessage sm = new SendMessage();
-            user=userService.saveOrEdit(user);
-            sm.setChatId(chatId);
-            sm.setText(user.toString());
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String groupId = getCleanText(update);
+            String chatId = getChatId(update);
+            if (groupId.equals("/start"))
+                return;
+            SendMessage sm = registerUser(groupId, chatId);
 
             try {
                 execute(sm);
@@ -78,22 +74,44 @@ public class ScheduleBot extends TelegramLongPollingBot {
             }
         }
     }
-    @Scheduled(fixedRate = 600000)
-    public void notifyUsers(){
-        userService.findAll().forEach(x-> {
+    private SendMessage registerUser(String groupId, String chatId) {
+        Group group = groupService.findByNumber(Integer.parseInt(groupId));
+        User user = new User();
+        user.setGroup(group);
+        user.setChatId(chatId);
+        user = userService.saveOrEdit(user);
+        SendMessage sm = new SendMessage();
+        sm.setChatId(chatId);
+        sm.setText(user.toString());
+        return sm;
+    }
+
+    private String getChatId(Update update) {
+        return update.getMessage().getChatId().toString();
+    }
+
+    private String getCleanText(Update update) {
+        return update.getMessage().getText().trim();
+    }
+
+    @Scheduled(cron = "0 0/10 * ? * MON,TUE,WED,THU,FRI,SAT")
+    public void notifyUsers() {
+        userService.findAll().forEach(x -> {
             try {
 
                 PairDto nextPair = groupService.getNextPair(x.getGroup());
-                if(nextPair.getLesson()!=null) {
-                    if (nextPair.getTime().toSecondOfDay()- LocalTime.now().toSecondOfDay()<600) {
+                if (nextPair.getLesson() != null) {
+                    if (nextPair.isTimeToNotify()) {
                         sendMessage(x.getChatId(), nextPair.toString());
                         log.info("Message sent");
                     }
                 }
+                log.info("scheduling worked");
 
             } catch (GroupNotFoundException e) {
                 throw new RuntimeException(e);
             }
         });
     }
+
 }

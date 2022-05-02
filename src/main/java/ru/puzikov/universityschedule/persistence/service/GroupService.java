@@ -7,9 +7,8 @@ import ru.puzikov.universityschedule.exception.GroupNotFoundException;
 import ru.puzikov.universityschedule.persistence.model.*;
 import ru.puzikov.universityschedule.persistence.repo.GroupRepository;
 
-import java.time.Duration;
+import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -30,28 +29,29 @@ public class GroupService {
         }
         return repository.findByNumber(group.getNumber()).get();
     }
+    @Transactional
 
-    public Group findByNumber(Integer number){
+    public Group findByNumber(Integer number) {
         return repository.findByNumber(number).orElseThrow(RuntimeException::new);
     }
 
     public PairDto getNextPair(Group group) throws GroupNotFoundException {
         Pair pairToReturn = null;
-        Group group1 = repository.findByNumber(group.getNumber()).orElseThrow(GroupNotFoundException::new);
-        LocalTime time = LocalTime.now();
-        List<Day> days = group1.getSchedule().getDays();
-        int i = LocalDate.now().getDayOfWeek().getValue() - 1;
-        if (i == 6) {
+        int dayInWeek = LocalDate.now().getDayOfWeek().getValue() - 1;
+        if (dayInWeek == 6) {
             return new PairDto(null, null);
         }
-        DayOfWeek dayOfWeek = DayOfWeek.getDayOfWeek(i);
-        for (int j = 0; j < days.size(); j++) {
-            Day day = days.get(i);
+        DayOfWeek dayOfWeek = DayOfWeek.getDayOfWeek(dayInWeek);
+        Group group1 = findGroup(group);
+        List<Day> days = group1.getSchedule().getDays();
+        LocalTime time = LocalTime.now();
+
+        for (Day day : days) {
             if (day.getDayOfWeek().equals(dayOfWeek)) {
                 List<Pair> pairs = day.getPairs();
                 int min = Integer.MAX_VALUE;
                 for (Pair pair : pairs) {
-                    int range = pair.getTime().toSecondOfDay() - time.toSecondOfDay();
+                    int range = pair.getRange(time);
                     if (range < min && range > 0) {
                         min = range;
                         pairToReturn = pair;
@@ -61,18 +61,14 @@ public class GroupService {
         }
         if (pairToReturn == null)
             return new PairDto(null, null);
-        LocalDateTime upperWeekDate = LocalDateTime.of(2022, 5, 2, 0, 5);
-        LocalDateTime now = LocalDateTime.now();
-        Lesson lesson;
-        if (!pairToReturn.isWeekDependent()) {
-            lesson = pairToReturn.getUpperLesson();
-        } else if ((Duration.between(upperWeekDate, now).toDays() / 7) % 2 == 0)
-            lesson = pairToReturn.getUpperLesson();
-        else
-            lesson = pairToReturn.getDownLesson();
+        Lesson lesson = pairToReturn.getLesson();
 
         return new PairDto(lesson, pairToReturn.getTime());
 
+    }
+
+    private Group findGroup(Group group) throws GroupNotFoundException {
+        return repository.findByNumber(group.getNumber()).orElseThrow(GroupNotFoundException::new);
     }
 
     public void deleteAll() {

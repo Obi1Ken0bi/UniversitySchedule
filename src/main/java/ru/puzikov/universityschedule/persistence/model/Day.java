@@ -3,6 +3,7 @@ package ru.puzikov.universityschedule.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Day {
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE},fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     @JoinTable(name = "day_pairs")
     List<Pair> pairs;
     @Id
@@ -25,8 +26,20 @@ public class Day {
     private DayOfWeek dayOfWeek;
 
 
+
     public Day(DayOfWeek dayOfWeek, List<Pair> pairs) {
         this.dayOfWeek = dayOfWeek;
         this.pairs = pairs;
+    }
+
+    @ManyToMany(mappedBy = "days")
+    private List<Schedule> schedule;
+
+    public Collection<Schedule> getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(List<Schedule> schedule) {
+        this.schedule = schedule;
     }
 }

@@ -1,11 +1,13 @@
 package ru.puzikov.universityschedule.misc;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Properties;
+
 @Service
 public class TelegramPropertiesReader {
     Reader fileReader;
@@ -17,7 +19,8 @@ public class TelegramPropertiesReader {
         fileReader = new FileReader("src/main/resources/telegram.properties");
         properties.load(fileReader);
     }
-    public  String getProperty(String property){
+
+    public String getProperty(String property) {
         return properties.getProperty(property);
     }
 }

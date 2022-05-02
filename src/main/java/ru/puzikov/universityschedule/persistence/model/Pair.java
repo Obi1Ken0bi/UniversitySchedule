@@ -3,6 +3,8 @@ package ru.puzikov.universityschedule.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class Pair {
     @SequenceGenerator(name = "pair_gen", sequenceName = "pair_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "upper_lesson_id")
     private Lesson upperLesson;
 
@@ -28,7 +30,7 @@ public class Pair {
 
     private boolean weekDependent;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "down_lesson_id")
     private Lesson downLesson;
 
@@ -51,5 +53,22 @@ public class Pair {
         if (upperWeek)
             return this.upperLesson;
         return this.downLesson;
+    }
+
+    public int getRange(LocalTime time) {
+        return getTime().toSecondOfDay() - time.toSecondOfDay();
+    }
+
+    public Lesson getLesson() {
+        LocalDateTime upperWeekDate = LocalDateTime.of(2022, 5, 2, 0, 5);
+        LocalDateTime now = LocalDateTime.now();
+        Lesson lesson;
+        if (!isWeekDependent()) {
+            lesson = getUpperLesson();
+        } else if ((Duration.between(upperWeekDate, now).toDays() / 7) % 2 == 0)
+            lesson = getUpperLesson();
+        else
+            lesson = getDownLesson();
+        return lesson;
     }
 }

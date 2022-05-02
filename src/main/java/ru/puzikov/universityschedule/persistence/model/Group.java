@@ -3,6 +3,7 @@ package ru.puzikov.universityschedule.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +21,7 @@ public class Group {
 
     private int number;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
@@ -32,4 +33,10 @@ public class Group {
         this.number = number;
         this.schedule = schedule;
     }
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "group")
+    @ToString.Exclude
+    private List<User> users;
+
+
 }

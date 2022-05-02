@@ -4,10 +4,11 @@ import org.springframework.stereotype.Service;
 import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.repo.UserRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     final
     UserRepository repository;
 
@@ -26,8 +27,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public User saveOrEdit(User user) {
-        if(repository.findByChatId(user.getChatId()).isEmpty())
+        if (repository.findByChatId(user.getChatId()).isEmpty())
             return repository.save(user);
         User user1 = repository.findByChatId(user.getChatId()).get();
         user1.setGroup(user.getGroup());

@@ -4,13 +4,13 @@ import lombok.*;
 
 import javax.persistence.*;
 
+@ToString
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lesson_gen")
@@ -39,4 +39,5 @@ public class Lesson {
         this.teacher = teacher;
         this.subject = subject;
     }
+
 }

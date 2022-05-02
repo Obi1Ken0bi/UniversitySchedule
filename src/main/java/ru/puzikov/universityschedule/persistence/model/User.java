@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 
 @Entity
@@ -21,15 +22,22 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
-
     private String chatId;
 
 
-    public User(Group group,String chatId) {
+    public User( String chatId) {
+
+        this.chatId = chatId;
+    }
+
+    @ManyToOne
+    private Group group;
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
         this.group = group;
-        this.chatId=chatId;
     }
 }
