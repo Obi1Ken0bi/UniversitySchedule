@@ -17,35 +17,12 @@ import java.util.List;
 @SpringBootApplication
 @Slf4j
 public class UniversityScheduleApplication {
-    @Autowired
-    Parser parser;
-    @Autowired
-    GroupRepository groupRepository;
-    @Value("${university.update}")
-    private Boolean needToUpdate;
+
 
 
     public static void main(String[] args) {
         SpringApplication.run(UniversityScheduleApplication.class, args);
     }
 
-    @Bean
 
-    public CommandLineRunner runner() {
-        return args -> {
-            if (needToUpdate) {
-                Site site = Site.builder()
-                        .groupClass("gr")
-                        .groupsUrl("https://www.smtu.ru/ru/listschedule/")
-                        .scheduleUrl("https://www.smtu.ru/ru/viewschedule")
-                        .build();
-                List<String> groups = parser.parseGroups(site);
-                for (int i=0;i<groups.size();i++) {
-                    Group group = parser.parseScheduleForGroup(site, Integer.parseInt(groups.get(i)));
-                    log.info(group.toString());
-                }
-            } else
-                log.info("No update needed");
-        };
-    }
 }
