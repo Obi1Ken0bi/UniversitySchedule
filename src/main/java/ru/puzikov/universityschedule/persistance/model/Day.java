@@ -11,11 +11,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
 public class Day {
-    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
-            @JoinTable(name = "day_pairs")
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
+    @JoinTable(name = "day_pairs")
     List<Pair> pairs;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "day_gen")

@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.puzikov.universityschedule.dto.PairDto;
 import ru.puzikov.universityschedule.exception.GroupNotFoundException;
 import ru.puzikov.universityschedule.persistance.model.Group;
-import ru.puzikov.universityschedule.persistance.model.Pair;
 import ru.puzikov.universityschedule.persistance.service.GroupService;
 
 @RestController

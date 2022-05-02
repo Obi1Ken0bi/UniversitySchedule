@@ -8,24 +8,19 @@ import java.util.List;
 
 @Entity
 @Getter
-@ToString
-
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Pair {
+    @ManyToMany(mappedBy = "pairs")
+    List<Day> days;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pair_gen")
     @SequenceGenerator(name = "pair_gen", sequenceName = "pair_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
-
-
-    @ManyToMany(mappedBy = "pairs")
-    List<Day> days;
-
-    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinColumn(name = "upper_lesson_id")
     private Lesson upperLesson;
 
@@ -33,7 +28,7 @@ public class Pair {
 
     private boolean weekDependent;
 
-    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinColumn(name = "down_lesson_id")
     private Lesson downLesson;
 

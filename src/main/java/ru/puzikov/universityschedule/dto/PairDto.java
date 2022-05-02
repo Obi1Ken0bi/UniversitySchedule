@@ -6,6 +6,7 @@ import lombok.Setter;
 import ru.puzikov.universityschedule.persistance.model.Lesson;
 
 import java.time.LocalTime;
+
 @Getter
 @Setter
 @AllArgsConstructor

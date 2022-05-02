@@ -1,12 +1,9 @@
 package ru.puzikov.universityschedule.persistance.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.puzikov.universityschedule.dto.PairDto;
 import ru.puzikov.universityschedule.exception.GroupNotFoundException;
-import ru.puzikov.universityschedule.parser.Parser;
-import ru.puzikov.universityschedule.parser.Site;
 import ru.puzikov.universityschedule.persistance.model.*;
 import ru.puzikov.universityschedule.persistance.repo.GroupRepository;
 
@@ -40,8 +37,8 @@ public class GroupService {
         LocalTime time = LocalTime.now();
         List<Day> days = group1.getSchedule().getDays();
         int i = LocalDate.now().getDayOfWeek().getValue() - 1;
-        if(i==6){
-            return new PairDto(null,null);
+        if (i == 6) {
+            return new PairDto(null, null);
         }
         DayOfWeek dayOfWeek = DayOfWeek.getDayOfWeek(i);
         for (int j = 0; j < days.size(); j++) {
@@ -51,32 +48,30 @@ public class GroupService {
                 int min = Integer.MAX_VALUE;
                 for (Pair pair : pairs) {
                     int range = pair.getTime().toSecondOfDay() - time.toSecondOfDay();
-                    if (range < min&&range>0) {
+                    if (range < min && range > 0) {
                         min = range;
                         pairToReturn = pair;
                     }
                 }
             }
         }
-        if(pairToReturn==null)
-            return new PairDto(null,null);
-        LocalDateTime upperWeekDate=LocalDateTime.of(2022,5,2,0,5);
-        LocalDateTime now=LocalDateTime.now();
+        if (pairToReturn == null)
+            return new PairDto(null, null);
+        LocalDateTime upperWeekDate = LocalDateTime.of(2022, 5, 2, 0, 5);
+        LocalDateTime now = LocalDateTime.now();
         Lesson lesson;
-        if(!pairToReturn.isWeekDependent()){
-            lesson=pairToReturn.getUpperLesson();
-        }
-        else
-        if((Duration.between(upperWeekDate,now).toDays()/7)%2==0)
+        if (!pairToReturn.isWeekDependent()) {
+            lesson = pairToReturn.getUpperLesson();
+        } else if ((Duration.between(upperWeekDate, now).toDays() / 7) % 2 == 0)
             lesson = pairToReturn.getUpperLesson();
         else
-            lesson=pairToReturn.getDownLesson();
+            lesson = pairToReturn.getDownLesson();
 
-        return new PairDto(lesson,pairToReturn.getTime());
+        return new PairDto(lesson, pairToReturn.getTime());
 
     }
 
-    public void deleteAll(){
+    public void deleteAll() {
         repository.deleteAll();
     }
 
