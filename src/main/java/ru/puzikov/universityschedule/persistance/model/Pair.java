@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,7 +22,10 @@ public class Pair {
     private Long id;
 
 
-    @ManyToOne
+    @ManyToMany(mappedBy = "pairs")
+    List<Day> days;
+
+    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     @JoinColumn(name = "upper_lesson_id")
     private Lesson upperLesson;
 
@@ -29,7 +33,7 @@ public class Pair {
 
     private boolean weekDependent;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     @JoinColumn(name = "down_lesson_id")
     private Lesson downLesson;
 

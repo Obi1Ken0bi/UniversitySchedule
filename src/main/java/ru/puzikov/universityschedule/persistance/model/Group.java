@@ -20,7 +20,7 @@ public class Group {
 
     private int number;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 

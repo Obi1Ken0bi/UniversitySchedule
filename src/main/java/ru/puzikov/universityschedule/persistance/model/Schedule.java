@@ -19,7 +19,7 @@ public class Schedule {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE)
     @ToString.Exclude
     private List<Day> days;
 

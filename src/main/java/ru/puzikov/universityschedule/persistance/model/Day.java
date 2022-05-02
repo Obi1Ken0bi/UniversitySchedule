@@ -14,7 +14,8 @@ import java.util.List;
 @ToString
 @Builder
 public class Day {
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
+            @JoinTable(name = "day_pairs")
     List<Pair> pairs;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "day_gen")

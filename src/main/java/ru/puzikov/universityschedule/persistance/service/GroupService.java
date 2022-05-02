@@ -41,7 +41,7 @@ public class GroupService {
                 int min = Integer.MAX_VALUE;
                 for (Pair pair : pairs) {
                     int range = pair.getTime().toSecondOfDay() - time.toSecondOfDay();
-                    if (range < min) {
+                    if (range < min&&range>0) {
                         min = range;
                         pairToReturn = pair;
                     }

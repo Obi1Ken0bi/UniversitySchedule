@@ -56,7 +56,7 @@ public class Parser {
         List<String> groupNames = new ArrayList<>();
         Elements groups = document.select("div.gr");
         for (Element group : groups) {
-            groupNames.add(group.text());
+            groupNames.add(getText(group));
         }
         return groupNames;
     }
@@ -64,15 +64,15 @@ public class Parser {
     private Pair parsePair(Element pairElem) {
         Elements infoElems = pairElem.select("td");
         Element timeAndWeekType = infoElems.get(0);
-        String time = timeAndWeekType.text().replace("Верхняя неделя", "").replace("Нижняя неделя", "").trim();
-        String weekType = timeAndWeekType.select("span").text().trim();
-        String buildingRoom = infoElems.get(1).text();
+        String time = parseTime(timeAndWeekType);
+        String weekType = parseSpanElem(timeAndWeekType);
+        String buildingRoom = getText(infoElems.get(1));
         Element subjAndTypeElem = infoElems.get(2);
-        String type = subjAndTypeElem.select("span").text().trim();
-        String subj = subjAndTypeElem.text().replace(type, "").trim();
-        String teacher = infoElems.get(3).text().trim();
-        char buildLetter = buildingRoom.trim().toLowerCase(Locale.ROOT).charAt(0);
-        String room = buildingRoom.substring(2).trim();
+        String type = parseSpanElem(subjAndTypeElem);
+        String subj = trim(getText(subjAndTypeElem).replace(type, ""));
+        String teacher = trim(getText(infoElems.get(3)));
+        char buildLetter = getBuildLetter(buildingRoom);
+        String room = trim(buildingRoom.substring(2));
         String[] s = teacher.split(" ");
         String firstTime = time.substring(0, 5);
         LocalTime localTime = LocalTime.parse(firstTime);
@@ -81,13 +81,7 @@ public class Parser {
         Room roomToCreate = Room.builder().building(building).number(room).build();
         roomToCreate = roomService.saveOrGet(roomToCreate);
         Teacher teacher1;
-        if (s.length == 2) {
-            teacher1 = Teacher.builder().surname(s[0]).name(s[1]).build();
-        } else if (!teacher.isEmpty()) {
-            teacher1 = Teacher.builder().surname(s[0]).name(s[1]).patronymic(s[2]).build();
-        } else {
-            teacher1 = Teacher.builder().surname("").name("").patronymic("").build();
-        }
+        teacher1 = buildTeacherName(teacher, s);
         teacher1 = teacherService.saveOrGet(teacher1);
         Subject subject = Subject.builder().name(subj).build();
         subject = subjectService.saveOrGet(subject);
@@ -100,40 +94,82 @@ public class Parser {
         return new Pair(lesson, null, localTime);
     }
 
+    private Teacher buildTeacherName(String teacher, String[] s) {
+        Teacher teacher1;
+        if (s.length == 2) {
+            teacher1 = Teacher.builder().surname(s[0]).name(s[1]).build();
+        } else if (!teacher.isEmpty()) {
+            teacher1 = Teacher.builder().surname(s[0]).name(s[1]).patronymic(s[2]).build();
+        } else {
+            teacher1 = Teacher.builder().surname("").name("").patronymic("").build();
+        }
+        return teacher1;
+    }
+
+    private String trim(String buildingRoom) {
+        return buildingRoom.trim();
+    }
+
+    private char getBuildLetter(String buildingRoom) {
+        return trim(buildingRoom).toLowerCase(Locale.ROOT).charAt(0);
+    }
+
+    private String getText(Element infoElems) {
+        return infoElems.text();
+    }
+
+    private String parseSpanElem(Element timeAndWeekType) {
+        return trim(timeAndWeekType.select("span").text());
+    }
+
+    private String parseTime(Element timeAndWeekType) {
+        return trim(getText(timeAndWeekType)
+                .replace("Верхняя неделя", "")
+                .replace("Нижняя неделя", ""));
+    }
+
     @SneakyThrows
     public Group parseScheduleForGroup(Site site, int groupNumber) {
         Document document = Jsoup.connect(site.getUrlForGroup(groupNumber)).get();
         Elements daysElems = document.select("tbody");
         Group group = new Group(groupNumber);
         Schedule schedule = Schedule.builder().days(new ArrayList<>()).build();
+        parseSchedule(daysElems, schedule);
+        schedule = scheduleService.save(schedule);
+        group.setSchedule(schedule);
+        group = groupService.saveOrGet(group);
+        return group;
+    }
+
+    private void parseSchedule(Elements daysElems, Schedule schedule) {
         for (int j = 0; j < daysElems.size(); j++) {
             Element dayElem = daysElems.get(j);
-            if (dayElem.text().equals("")) continue;
+            if (getText(dayElem).equals("")) continue;
             Day day = Day.builder().dayOfWeek(DayOfWeek.getDayOfWeek(j - 1)).pairs(new ArrayList<>()).build();
             Elements pairElems = dayElem.select("tr");
-            for (int i = 0; i < pairElems.size() - 1; i++) {
-                Pair pair = parsePair(pairElems.get(i));
-                Pair nextPair = parsePair(pairElems.get(i + 1));
-                if (pair.getTime().equals(nextPair.getTime())) {
-                    pair.setDownLesson(nextPair.getUpperLesson());
-                    i++;
-                } else {
-                    if (i + 1 == pairElems.size() - 1) {
-                        nextPair = pairService.saveOrGet(nextPair);
-                        day.getPairs().add(nextPair);
-                    }
-                }
-                pair = pairService.saveOrGet(pair);
-                day.getPairs().add(pair);
-            }
+            parseDay(day, pairElems);
             day.getPairs().sort(Comparator.comparingInt(x -> x.getTime().getHour()));
             day = dayService.save(day);
             schedule.getDays().add(day);
 
         }
-        schedule = scheduleService.save(schedule);
-        group.setSchedule(schedule);
-        group = groupService.saveOrGet(group);
-        return group;
+    }
+
+    private void parseDay(Day day, Elements pairElems) {
+        for (int i = 0; i < pairElems.size() - 1; i++) {
+            Pair pair = parsePair(pairElems.get(i));
+            Pair nextPair = parsePair(pairElems.get(i + 1));
+            if (pair.getTime().equals(nextPair.getTime())) {
+                pair.setDownLesson(nextPair.getUpperLesson());
+                i++;
+            } else {
+                if (i + 1 == pairElems.size() - 1) {
+                    nextPair = pairService.saveOrGet(nextPair);
+                    day.getPairs().add(nextPair);
+                }
+            }
+            pair = pairService.saveOrGet(pair);
+            day.getPairs().add(pair);
+        }
     }
 }
