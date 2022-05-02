@@ -40,8 +40,8 @@ public class UniversityScheduleApplication {
                         .scheduleUrl("https://www.smtu.ru/ru/viewschedule")
                         .build();
                 List<String> groups = parser.parseGroups(site);
-                for (String s : groups) {
-                    Group group = parser.parseScheduleForGroup(site, Integer.parseInt(s));
+                for (int i=0;i<groups.size();i++) {
+                    Group group = parser.parseScheduleForGroup(site, Integer.parseInt(groups.get(i)));
                     log.info(group.toString());
                 }
             } else

@@ -25,7 +25,7 @@ public class Pair {
     @ManyToMany(mappedBy = "pairs")
     List<Day> days;
 
-    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
     @JoinColumn(name = "upper_lesson_id")
     private Lesson upperLesson;
 
@@ -33,7 +33,7 @@ public class Pair {
 
     private boolean weekDependent;
 
-    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
     @JoinColumn(name = "down_lesson_id")
     private Lesson downLesson;
 
