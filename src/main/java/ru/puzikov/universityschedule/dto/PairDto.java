@@ -18,12 +18,12 @@ public class PairDto {
 
     @JsonIgnore
     public boolean isTimeToNotify() {
-        return getTime().toSecondOfDay() - LocalTime.now().toSecondOfDay() < 3600;
+        return getTime().toSecondOfDay() - LocalTime.now().toSecondOfDay() < 900;
     }
 
     public String toString() {
-        return String.format("Следующее занятие: %sВ корпусе %s В кабинете %s, time=%s)",
-                this.getLesson().getSubject(),
+        return String.format("Следующее занятие: %s В кабинете %s%s, Время=%s)",
+                this.getLesson().getSubject().getName(),
                 this.getLesson().getRoom().getBuilding(),
                 this.getLesson().getRoom().getNumber(),
                 this.getTime());
