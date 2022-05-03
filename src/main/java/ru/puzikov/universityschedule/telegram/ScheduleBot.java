@@ -94,7 +94,6 @@ public class ScheduleBot extends TelegramLongPollingBot {
         return update.getMessage().getText().trim();
     }
 
-    @Scheduled(cron = "0 */10 * * * *")
     @Transactional
     public void notifyUsers() {
         userService.findAll().forEach(x -> {
