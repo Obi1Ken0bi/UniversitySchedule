@@ -22,10 +22,10 @@ public class PairDto {
     }
 
     public String toString() {
-        return String.format("Следующее занятие: %s В кабинете %s%s, Время=%s)",
+        return String.format("%s: %s В кабинете %s%s.",
+                this.getTime(),
                 this.getLesson().getSubject().getName(),
-                this.getLesson().getRoom().getBuilding(),
-                this.getLesson().getRoom().getNumber(),
-                this.getTime());
+                this.getLesson().getRoom().getBuilding().getLetter(),
+                this.getLesson().getRoom().getNumber());
     }
 }
