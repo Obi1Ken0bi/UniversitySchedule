@@ -2,6 +2,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:14.2
+    container_name: postgres_container
     environment:
       POSTGRES_DB: "Schedule"
       POSTGRES_USER: "postgres"
@@ -11,3 +12,21 @@ services:
       - .:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - schedule
+    restart: unless-stopped
+  schedule:
+    image: ubik33/schedule
+    container_name: schedule_server
+    environment:
+
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/Schedule"
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+    networks:
+      - schedule
+
+networks:
+  schedule:
+    driver: bridge
