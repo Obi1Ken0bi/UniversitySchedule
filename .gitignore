@@ -32,3 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /src/main/resources/telegram.properties
+/src/main/jib/src/
