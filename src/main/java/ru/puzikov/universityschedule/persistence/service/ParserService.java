@@ -14,6 +14,7 @@ public class ParserService {
     final
     Parser parser;
     private final GroupService groupService;
+    private boolean lock = false;
 
     public ParserService(GroupService groupService, Parser parser) {
         this.groupService = groupService;
@@ -21,6 +22,9 @@ public class ParserService {
     }
 
     public void refresh() {
+        if (lock)
+            return;
+        lock = true;
         groupService.deleteAll();
         Site site = Site.builder()
                 .groupClass("gr")
@@ -32,6 +36,7 @@ public class ParserService {
             Group group = parser.parseScheduleForGroup(site, Integer.parseInt(s));
             log.info(group.toString());
         }
+        lock = false;
 
     }
 }

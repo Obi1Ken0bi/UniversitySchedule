@@ -10,10 +10,8 @@ import java.util.Properties;
 
 @Service
 public class TelegramPropertiesReader {
+    final Properties properties = new Properties();
     Reader fileReader;
-
-
-    Properties properties = new Properties();
 
     public TelegramPropertiesReader() throws IOException {
         fileReader = new FileReader("src/main/resources/telegram.properties");

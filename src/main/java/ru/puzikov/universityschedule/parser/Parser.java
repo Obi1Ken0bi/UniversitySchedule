@@ -11,10 +11,7 @@ import ru.puzikov.universityschedule.persistence.model.*;
 import ru.puzikov.universityschedule.persistence.service.*;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -32,20 +29,17 @@ public class Parser {
     final
     RoomService roomService;
     final
-    ScheduleService scheduleService;
-    final
     SubjectService subjectService;
     final
     TeacherService teacherService;
 
-    public Parser(BuildingService buildingService, DayService dayService, GroupService groupService, LessonService lessonService, PairService pairService, RoomService roomService, ScheduleService scheduleService, SubjectService subjectService, TeacherService teacherService) {
+    public Parser(BuildingService buildingService, DayService dayService, GroupService groupService, LessonService lessonService, PairService pairService, RoomService roomService, SubjectService subjectService, TeacherService teacherService) {
         this.buildingService = buildingService;
         this.dayService = dayService;
         this.groupService = groupService;
         this.lessonService = lessonService;
         this.pairService = pairService;
         this.roomService = roomService;
-        this.scheduleService = scheduleService;
         this.subjectService = subjectService;
         this.teacherService = teacherService;
     }
@@ -133,24 +127,26 @@ public class Parser {
         Document document = Jsoup.connect(site.getUrlForGroup(groupNumber)).get();
         Elements daysElems = document.select("tbody");
         Group group = new Group(groupNumber);
-        Schedule schedule = Schedule.builder().days(new ArrayList<>()).build();
+        Map<Integer, Day> schedule = new HashMap<>(7, 1f);
         parseSchedule(daysElems, schedule);
-        schedule = scheduleService.save(schedule);
         group.setSchedule(schedule);
         group = groupService.saveOrGet(group);
         return group;
     }
 
-    private void parseSchedule(Elements daysElems, Schedule schedule) {
+    private void parseSchedule(Elements daysElems, Map<Integer, Day> schedule) {
         for (int j = 0; j < daysElems.size(); j++) {
             Element dayElem = daysElems.get(j);
-            if (getText(dayElem).equals("")) continue;
-            Day day = Day.builder().dayOfWeek(DayOfWeek.getDayOfWeek(j - 1)).pairs(new ArrayList<>()).build();
+            if (getText(dayElem).equals("")) {
+
+                continue;
+            }
+            Day day = Day.builder().dayOfWeek(j).pairs(new ArrayList<>()).build();
             Elements pairElems = dayElem.select("tr");
             parseDay(day, pairElems);
             day.getPairs().sort(Comparator.comparingInt(x -> x.getTime().getHour()));
             day = dayService.save(day);
-            schedule.getDays().add(day);
+            schedule.put(j, day);
 
         }
     }

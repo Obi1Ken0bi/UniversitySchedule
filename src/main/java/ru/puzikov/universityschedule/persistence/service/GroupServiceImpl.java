@@ -4,7 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.puzikov.universityschedule.dto.PairDto;
 import ru.puzikov.universityschedule.exception.GroupNotFoundException;
-import ru.puzikov.universityschedule.persistence.model.*;
+import ru.puzikov.universityschedule.persistence.model.Day;
+import ru.puzikov.universityschedule.persistence.model.Group;
+import ru.puzikov.universityschedule.persistence.model.Lesson;
+import ru.puzikov.universityschedule.persistence.model.Pair;
 import ru.puzikov.universityschedule.persistence.repo.GroupRepository;
 
 import javax.transaction.Transactional;
@@ -39,28 +42,32 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Day getPairsForDay(int groupNumber, int k) {
+        return repository.findByNumber(groupNumber)
+                .get()
+                .getSchedule()
+                .get(k);
+    }
+
+    @Override
     public PairDto getNextPair(Group group) throws GroupNotFoundException {
         Pair pairToReturn = null;
-        int dayInWeek = LocalDate.now().getDayOfWeek().getValue() - 1;
-        if (dayInWeek == 6) {
+        int dayInWeek = LocalDate.now().getDayOfWeek().getValue();
+        if (dayInWeek == 7) {
             return new PairDto(null, null);
         }
-        DayOfWeek dayOfWeek = DayOfWeek.getDayOfWeek(dayInWeek);
         Group group1 = findGroup(group);
-        List<Day> days = group1.getSchedule().getDays();
+        Day day = group1.getSchedule().get(dayInWeek);
         LocalTime time = LocalTime.now();
 
-        for (Day day : days) {
-            if (day.getDayOfWeek().equals(dayOfWeek)) {
-                List<Pair> pairs = day.getPairs();
-                int min = Integer.MAX_VALUE;
-                for (Pair pair : pairs) {
-                    int range = pair.getRange(time);
-                    if (range < min && range > 0) {
-                        min = range;
-                        pairToReturn = pair;
-                    }
-                }
+
+        List<Pair> pairs = day.getPairs();
+        int min = Integer.MAX_VALUE;
+        for (Pair pair : pairs) {
+            int range = pair.getRange(time);
+            if (range < min && range > 0) {
+                min = range;
+                pairToReturn = pair;
             }
         }
         if (pairToReturn == null)

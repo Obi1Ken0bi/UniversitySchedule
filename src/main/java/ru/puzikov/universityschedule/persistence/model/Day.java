@@ -3,7 +3,6 @@ package ru.puzikov.universityschedule.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -22,21 +21,13 @@ public class Day {
     @SequenceGenerator(name = "day_gen", sequenceName = "day_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
-    @Enumerated(EnumType.STRING)
-    private DayOfWeek dayOfWeek;
-    @ManyToMany(mappedBy = "days")
-    private List<Schedule> schedule;
+    private int dayOfWeek;
 
-    public Day(DayOfWeek dayOfWeek, List<Pair> pairs) {
+
+    public Day(int dayOfWeek, List<Pair> pairs) {
         this.dayOfWeek = dayOfWeek;
         this.pairs = pairs;
     }
 
-    public Collection<Schedule> getSchedule() {
-        return schedule;
-    }
 
-    public void setSchedule(List<Schedule> schedule) {
-        this.schedule = schedule;
-    }
 }

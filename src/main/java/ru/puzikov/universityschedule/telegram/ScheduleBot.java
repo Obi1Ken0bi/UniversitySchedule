@@ -16,8 +16,9 @@ import ru.puzikov.universityschedule.persistence.service.UserServiceImpl;
 
 import javax.transaction.Transactional;
 
-@Component
+
 @Slf4j
+@Component
 public class ScheduleBot extends TelegramLongPollingBot {
     final
     UserServiceImpl userService;
