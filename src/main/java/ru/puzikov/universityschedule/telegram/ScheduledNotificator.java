@@ -1,9 +1,6 @@
 package ru.puzikov.universityschedule.telegram;
 
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
-@Service
+//@Service
 public class ScheduledNotificator {
 
     final
@@ -13,7 +10,7 @@ public class ScheduledNotificator {
         this.bot = bot;
     }
 
-    @Scheduled(cron = "0 0/10 * * * ?")
+    //@Scheduled(cron = "0 0/10 * * * ?")
     public void notifyStudents() {
         bot.notifyUsers();
     }

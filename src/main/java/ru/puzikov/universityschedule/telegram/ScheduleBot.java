@@ -1,7 +1,6 @@
 package ru.puzikov.universityschedule.telegram;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,8 +15,9 @@ import ru.puzikov.universityschedule.persistence.service.UserServiceImpl;
 
 import javax.transaction.Transactional;
 
-@Component
+
 @Slf4j
+//@Component
 public class ScheduleBot extends TelegramLongPollingBot {
     final
     UserServiceImpl userService;

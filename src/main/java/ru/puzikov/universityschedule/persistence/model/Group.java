@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -21,9 +22,14 @@ public class Group {
 
     private int number;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "schedule_id")
-    private Schedule schedule;
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @ToString.Exclude
+    @JoinTable(name = "group_day_mapping",
+            joinColumns = {@JoinColumn(name = "group_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "day_id", referencedColumnName = "id")})
+    @MapKeyColumn(name = "dayOfTheWeek")
+    private Map<Integer, Day> schedule;
+
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "group")
     @ToString.Exclude
     private List<User> users;
@@ -32,9 +38,9 @@ public class Group {
         this.number = number;
     }
 
-    public Group(int number, Schedule schedule) {
+    public Group(int number, Map<Integer, Day> map) {
         this.number = number;
-        this.schedule = schedule;
+        this.schedule = map;
     }
 
 

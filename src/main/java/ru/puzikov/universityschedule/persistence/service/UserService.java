@@ -5,9 +5,9 @@ import ru.puzikov.universityschedule.persistence.model.User;
 import java.util.List;
 
 public interface UserService {
-    public User findByChatId(String chatId);
+    User findByChatId(String chatId);
 
-    public List<User> findAll();
+    List<User> findAll();
 
-    public User saveOrEdit(User user);
+    User saveOrEdit(User user);
 }

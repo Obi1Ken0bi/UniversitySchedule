@@ -1,5 +1,6 @@
 package ru.puzikov.universityschedule.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @Builder
 public class Pair {
     @ManyToMany(mappedBy = "pairs")
+    @JsonIgnore
     List<Day> days;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pair_gen")
