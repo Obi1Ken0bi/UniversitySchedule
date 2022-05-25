@@ -25,20 +25,20 @@ public class Day {
     @Column(name = "id", nullable = false)
     private Long id;
     private int dayOfWeek;
-    @JsonIgnore
-    public List<PairDto> getAllPairsWeekDependent(){
-        List<PairDto> pairDtos=new ArrayList<>();
-        for (Pair pair : pairs) {
-            PairDto pairDto=new PairDto(pair.getLesson(),pair.getTime());
-            pairDtos.add(pairDto);
-        }
-        return pairDtos;
-    }
-
 
     public Day(int dayOfWeek, List<Pair> pairs) {
         this.dayOfWeek = dayOfWeek;
         this.pairs = pairs;
+    }
+
+    @JsonIgnore
+    public List<PairDto> getAllPairsWeekDependent() {
+        List<PairDto> pairDtos = new ArrayList<>();
+        for (Pair pair : pairs) {
+            PairDto pairDto = new PairDto(pair.getLesson(), pair.getTime());
+            pairDtos.add(pairDto);
+        }
+        return pairDtos;
     }
 
 

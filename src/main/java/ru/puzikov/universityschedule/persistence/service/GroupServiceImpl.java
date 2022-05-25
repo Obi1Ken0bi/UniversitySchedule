@@ -42,6 +42,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public Day getPairsForDay(int groupNumber, int k) {
         return repository.findByNumber(groupNumber)
                 .get()

@@ -1,24 +1,28 @@
 package ru.puzikov.universityschedule.telegram.message;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.puzikov.universityschedule.persistence.model.Group;
 import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.service.GroupService;
 import ru.puzikov.universityschedule.persistence.service.UserService;
+import ru.puzikov.universityschedule.telegram.ScheduleBot;
 
 @Service
 @Slf4j
 public class RegisterMessageProcessor implements MessageProcessor {
     final
     GroupService groupService;
-
     final
     UserService userService;
+    @Setter
+    private ScheduleBot scheduleBot;
 
     public RegisterMessageProcessor(GroupService groupService, UserService userService) {
         this.groupService = groupService;
         this.userService = userService;
+
     }
 
     @Override
@@ -31,8 +35,12 @@ public class RegisterMessageProcessor implements MessageProcessor {
 
 
         User user = userService.findByChatId(chatId);
+        if (user.getGroup() == null) {
+            user.setGroup(group);
+            scheduleBot.queueNotifications(user);
+        } else
+            user.setGroup(group);
         log.info(String.format("New user: %s", user));
-        user.setGroup(group);
 
         return userService.saveOrEdit(user).toString();
     }
