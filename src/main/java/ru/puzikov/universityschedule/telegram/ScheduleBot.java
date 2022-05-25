@@ -9,15 +9,18 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.puzikov.universityschedule.dto.PairDto;
 import ru.puzikov.universityschedule.exception.GroupNotFoundException;
 import ru.puzikov.universityschedule.misc.TelegramPropertiesReader;
-import ru.puzikov.universityschedule.persistence.model.Group;
-import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.service.GroupService;
 import ru.puzikov.universityschedule.persistence.service.UserServiceImpl;
+import ru.puzikov.universityschedule.telegram.message.*;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -29,16 +32,28 @@ public class ScheduleBot extends TelegramLongPollingBot {
     private final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(5);
 
     private final GroupService groupService;
+    private final RegisterMessageProcessor registerMessageProcessor;
 
+    private final Map<String, MessageProcessor> messageMap = new HashMap<>();
 
     private final String name;
     private final String token;
 
-    public ScheduleBot(TelegramPropertiesReader telegramPropertiesReader, UserServiceImpl userService, GroupService groupService) {
+    public ScheduleBot(TelegramPropertiesReader telegramPropertiesReader,
+                       UserServiceImpl userService,
+                       GroupService groupService,
+                       RegisterMessageProcessor registerMessageProcessor,
+                       DelayMessageProcessor delayMessageProcessor,
+                       HelpMessageProcessor helpMessageProcessor,
+                       StartMessageProcessor startMessageProcessor) {
         token = telegramPropertiesReader.getProperty("telegram.token");
         name = telegramPropertiesReader.getProperty("telegram.name");
         this.userService = userService;
         this.groupService = groupService;
+        this.registerMessageProcessor = registerMessageProcessor;
+        messageMap.put("/help", helpMessageProcessor);
+        messageMap.put("/start", startMessageProcessor);
+        messageMap.put("/delay", delayMessageProcessor);
     }
 
     @Override
@@ -65,11 +80,12 @@ public class ScheduleBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String groupId = getCleanText(update);
+            String message = getCleanText(update);
+            String command = findCommand(message);
             String chatId = getChatId(update);
-            if (groupId.equals("/start"))
-                return;
-            SendMessage sm = registerUser(groupId, chatId);
+            MessageProcessor messageProcessor = messageMap.getOrDefault(command.trim(), registerMessageProcessor);
+            String answer = messageProcessor.execute(message.replace(command, "").trim(), chatId);
+            SendMessage sm = new SendMessage(chatId, answer);
 
             try {
                 execute(sm);
@@ -79,17 +95,14 @@ public class ScheduleBot extends TelegramLongPollingBot {
         }
     }
 
-    private SendMessage registerUser(String groupId, String chatId) {
-        Group group = groupService.findByNumber(Integer.parseInt(groupId));
-        User user = new User();
-        user.setGroup(group);
-        user.setChatId(chatId);
-        user = userService.saveOrEdit(user);
-        SendMessage sm = new SendMessage();
-        sm.setChatId(chatId);
-        sm.setText(user.toString());
-        return sm;
+    private String findCommand(String message) {
+        Pattern pattern = Pattern.compile("/[a-z]*");
+        Matcher matcher = pattern.matcher(message);
+        if (matcher.find())
+            return matcher.group();
+        return "";
     }
+
 
     private String getChatId(Update update) {
         return update.getMessage().getChatId().toString();

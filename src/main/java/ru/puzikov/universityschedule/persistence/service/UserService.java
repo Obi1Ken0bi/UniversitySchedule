@@ -10,4 +10,8 @@ public interface UserService {
     List<User> findAll();
 
     User saveOrEdit(User user);
+
+    User findByChatIdOrSave(User user);
+
+    void changeDelay(String chatId, int delay);
 }
