@@ -21,6 +21,9 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @JsonIgnore
+    private int delay = 10;
+
     private String chatId;
     @ManyToOne
     private Group group;
