@@ -15,6 +15,9 @@ import ru.puzikov.universityschedule.persistence.service.GroupService;
 import ru.puzikov.universityschedule.persistence.service.UserServiceImpl;
 
 import javax.transaction.Transactional;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -22,6 +25,8 @@ import javax.transaction.Transactional;
 public class ScheduleBot extends TelegramLongPollingBot {
     final
     UserServiceImpl userService;
+
+    private final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(5);
 
     private final GroupService groupService;
 
@@ -101,10 +106,15 @@ public class ScheduleBot extends TelegramLongPollingBot {
 
                 PairDto nextPair = groupService.getNextPair(x.getGroup());
                 if (nextPair.getLesson() != null) {
-                    if (nextPair.isTimeToNotify()) {
-                        sendMessage(x.getChatId(), nextPair.toString());
-                        log.info("Message sent");
-                    }
+
+                    int delay = nextPair.minutesToPair() - x.getDelay();
+                    service.schedule(() -> sendMessage(x.getChatId(), nextPair.toString()),
+                            Math.max(delay, 0),
+                            TimeUnit.MINUTES);
+
+
+                    log.info("Message sent");
+
                 }
                 log.info("scheduling worked");
 

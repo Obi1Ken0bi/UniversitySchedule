@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 import ru.puzikov.universityschedule.persistence.model.Pair;
 import ru.puzikov.universityschedule.persistence.repo.PairRepository;
 
+import java.time.LocalTime;
+import java.util.List;
+
 @Service
 public class PairServiceImpl implements PairService {
     final
@@ -26,5 +29,10 @@ public class PairServiceImpl implements PairService {
                         pair.getTime(),
                         pair.getDownLesson())
                 .get();
+    }
+
+    @Override
+    public List<LocalTime> getDistinctTimes() {
+        return repository.findDistinctTimes();
     }
 }
