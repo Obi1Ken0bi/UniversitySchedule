@@ -1,8 +1,11 @@
 package ru.puzikov.universityschedule.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import ru.puzikov.universityschedule.dto.PairDto;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,6 +25,15 @@ public class Day {
     @Column(name = "id", nullable = false)
     private Long id;
     private int dayOfWeek;
+    @JsonIgnore
+    public List<PairDto> getAllPairsWeekDependent(){
+        List<PairDto> pairDtos=new ArrayList<>();
+        for (Pair pair : pairs) {
+            PairDto pairDto=new PairDto(pair.getLesson(),pair.getTime());
+            pairDtos.add(pairDto);
+        }
+        return pairDtos;
+    }
 
 
     public Day(int dayOfWeek, List<Pair> pairs) {

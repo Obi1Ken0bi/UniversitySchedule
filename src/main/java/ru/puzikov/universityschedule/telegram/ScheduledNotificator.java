@@ -30,6 +30,7 @@ public class ScheduledNotificator {
     public TimeTaskExecutor notifyStudents() {
         TimeTaskExecutor executor = new TimeTaskExecutor(new Task(bot::notifyUsers));
         List<LocalTime> distinctTimes = pairService.getDistinctTimes();
+        distinctTimes.add(LocalTime.of(0,1));
         for (LocalTime time : distinctTimes) {
             log.info(String.valueOf(time));
             executor.startExecutionAt(time.getHour(), time.getMinute(), 0);
