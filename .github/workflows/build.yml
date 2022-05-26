@@ -23,11 +23,11 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Create secret directory
-      run: mkdir src/main/jib/src/main/resources
+      run: mkdir ./src/main/jib/src/main/resources
     - name: Create secret file
-      run: echo "telegram.token=${{ secrets.TELEGRAM_TOKEN}}" > src/main/jib/src/main/resources/telegram.properties
+      run: echo "telegram.token=${{ secrets.TELEGRAM_TOKEN}}" > ./src/main/jib/src/main/resources/telegram.properties
     - name: Add bot name
-      run: echo "telegram.name=${{secrets.TELEGRAM_NAME}}" >> src/main/jib/src/main/resources/telegram.properties
+      run: echo "telegram.name=${{secrets.TELEGRAM_NAME}}" >> ./src/main/jib/src/main/resources/telegram.properties
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: build docker container
