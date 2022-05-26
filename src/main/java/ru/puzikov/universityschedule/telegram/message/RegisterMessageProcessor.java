@@ -39,7 +39,7 @@ public class RegisterMessageProcessor implements MessageProcessor {
         if (oldGroup == null) {
             user.setGroup(group);
             scheduleBot.queueNotifications(user);
-        } else if (oldGroup != group) {
+        } else if (oldGroup.getNumber() != group.getNumber()) {
             user.setGroup(group);
             scheduleBot.changeNotifications(user);
         } else
