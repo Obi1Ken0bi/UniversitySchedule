@@ -29,6 +29,6 @@ jobs:
         mvn jib:build -f pom.xml \
         -Djib.to.image=registry.hub.docker.com/${{ secrets.DOCKER_HUB_USERNAME }}/schedule:latest \
         -Djib.to.auth.username=${{ secrets.DOCKER_HUB_USERNAME }} \
-        -Djib.to.auth.password=${{ DOCKER_HUB_PASSWORD }}
+        -Djib.to.auth.password=${{ secrets.DOCKER_HUB_PASSWORD }}
 
 
