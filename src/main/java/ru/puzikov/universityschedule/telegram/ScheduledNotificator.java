@@ -3,7 +3,6 @@ package ru.puzikov.universityschedule.telegram;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.config.Task;
 import ru.puzikov.universityschedule.misc.TimeTaskExecutor;
 import ru.puzikov.universityschedule.persistence.service.PairService;
 
@@ -26,8 +25,8 @@ public class ScheduledNotificator {
 
     @Bean
     public TimeTaskExecutor notifyStudents() {
-        TimeTaskExecutor executor = new TimeTaskExecutor(new Task(bot::notifyUsers));
-        executor.startExecutionAt(0, 1, 0);
+        TimeTaskExecutor executor = new TimeTaskExecutor(bot::notifyUsers);
+        executor.startExecutionAt(0, 0, 30);
         log.info("executor ready");
         return executor;
     }

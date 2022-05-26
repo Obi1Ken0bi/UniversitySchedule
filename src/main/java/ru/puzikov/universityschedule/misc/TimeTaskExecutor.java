@@ -1,7 +1,6 @@
 package ru.puzikov.universityschedule.misc;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.config.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -16,20 +15,21 @@ import java.util.concurrent.TimeUnit;
 public
 class TimeTaskExecutor {
     ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
-    Task myTask;
+    Runnable myTask;
     volatile boolean isStopIssued;
 
-    public TimeTaskExecutor(Task myTask$) {
+    public TimeTaskExecutor(Runnable myTask$) {
         myTask = myTask$;
 
     }
 
     public void startExecutionAt(int targetHour, int targetMin, int targetSec) {
         Runnable taskWrapper = () -> {
-            myTask.getRunnable().run();
+            myTask.run();
             startExecutionAt(targetHour, targetMin, targetSec);
         };
         long delay = computeNextDelay(targetHour, targetMin, targetSec);
+        log.info("Delay: " + (delay));
         executorService.schedule(taskWrapper, delay, TimeUnit.SECONDS);
     }
 
@@ -38,7 +38,7 @@ class TimeTaskExecutor {
         ZoneId currentZone = ZoneId.systemDefault();
         ZonedDateTime zonedNow = ZonedDateTime.of(localNow, currentZone);
         ZonedDateTime zonedNextTarget = zonedNow.withHour(targetHour).withMinute(targetMin).withSecond(targetSec);
-        if (zonedNow.compareTo(zonedNextTarget) > 0)
+        if (zonedNow.compareTo(zonedNextTarget) >= 0)
             zonedNextTarget = zonedNextTarget.plusDays(1);
 
         Duration duration = Duration.between(zonedNow, zonedNextTarget);

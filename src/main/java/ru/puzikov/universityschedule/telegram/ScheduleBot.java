@@ -117,7 +117,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
         return update.getMessage().getText().trim();
     }
 
-    @Transactional
+
     public void notifyUsers() {
         userService.findAll().forEach(user -> {
             queueNotifications(user);
@@ -128,7 +128,6 @@ public class ScheduleBot extends TelegramLongPollingBot {
     }
 
     @Transactional
-
     public void queueNotifications(User user) {
         log.info(String.valueOf(user));
         Stream<Pair> pairStream = groupService.getPairsForDay(user.getGroup().getNumber(), LocalDate.now().getDayOfWeek().getValue())
@@ -139,8 +138,9 @@ public class ScheduleBot extends TelegramLongPollingBot {
         for (Pair pair : pairs) {
             PairDto pairDto = new PairDto(pair.getLesson(), pair.getTime());
             int delay = pairDto.minutesToPair() - user.getDelay();
-            if (delay < 0)
+            if (delay < 0 && pairDto.minutesToPair() < 0)
                 continue;
+            delay = Math.max(delay, 0);
             Executor afterDelay = CompletableFuture.delayedExecutor(delay, TimeUnit.MINUTES, service);
             CompletableFuture<Void> completableFuture =
                     CompletableFuture.runAsync(() -> sendMessage(user.getChatId(), pairDto.toString()), afterDelay);
