@@ -16,10 +16,7 @@ import ru.puzikov.universityschedule.telegram.message.*;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +31,8 @@ public class ScheduleBot extends TelegramLongPollingBot {
     UserServiceImpl userService;
 
     private final ExecutorService service = Executors.newFixedThreadPool(5);
+
+    private final Map<User, List<CompletableFuture>> futureMap = new HashMap<>();
 
     private final GroupService groupService;
     private final RegisterMessageProcessor registerMessageProcessor;
@@ -54,6 +53,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
         name = telegramPropertiesReader.getProperty("telegram.name");
         this.userService = userService;
         this.groupService = groupService;
+        delayMessageProcessor.setScheduleBot(this);
         registerMessageProcessor.setScheduleBot(this);
         this.registerMessageProcessor = registerMessageProcessor;
         messageMap.put("/help", helpMessageProcessor);
@@ -127,6 +127,17 @@ public class ScheduleBot extends TelegramLongPollingBot {
         });
     }
 
+    public void changeDelay(User user) {
+
+        var completableFutures = futureMap.get(user);
+        if(completableFutures!=null) {
+            for (var future : completableFutures) {
+                future.cancel(true);
+            }
+        }
+        queueNotifications(user);
+    }
+
     @Transactional
     public void queueNotifications(User user) {
         log.info(String.valueOf(user));
@@ -144,6 +155,9 @@ public class ScheduleBot extends TelegramLongPollingBot {
             Executor afterDelay = CompletableFuture.delayedExecutor(delay, TimeUnit.MINUTES, service);
             CompletableFuture<Void> completableFuture =
                     CompletableFuture.runAsync(() -> sendMessage(user.getChatId(), pairDto.toString()), afterDelay);
+            var futureList = futureMap.getOrDefault(user, new ArrayList<>());
+            futureList.add(completableFuture);
+            futureMap.put(user, futureList);
             completableFuture.thenRun(() -> log.info("message sent"));
         }
     }
