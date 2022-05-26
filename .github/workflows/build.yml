@@ -24,14 +24,11 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: Login to GitHub Container Registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
     - name: build docker container
-      run: mvn jib:build -f pom.xml
-    - name: Tag & publish to GitHub Container Registry
-      run: |
-        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-        VERSION=latest
-        docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-        docker push $IMAGE_ID:$VERSION
+      run: | 
+        mvn jib:build -f pom.xml \
+        -Djib.to.image=registry.hub.docker.com/${{ secrets.DOCKER_HUB_USERNAME }}/schedule:latest \
+        -Djib.to.auth.username=${{ secrets.DOCKER_HUB_USERNAME }} \
+        -Djib.to.auth.password=${{ DOCKER_HUB_PASSWORD }}
+
 
