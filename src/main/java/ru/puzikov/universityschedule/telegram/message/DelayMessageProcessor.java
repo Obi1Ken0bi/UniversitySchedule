@@ -23,7 +23,7 @@ public class DelayMessageProcessor implements MessageProcessor {
 
         userService.changeDelay(chatId, Integer.parseInt(message));
         User user = userService.findByChatId(chatId);
-        scheduleBot.changeDelay(user);
+        scheduleBot.changeNotifications(user);
         return "Задержка изменена";
     }
 }

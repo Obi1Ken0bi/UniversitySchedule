@@ -35,13 +35,18 @@ public class RegisterMessageProcessor implements MessageProcessor {
 
 
         User user = userService.findByChatId(chatId);
-        if (user.getGroup() == null) {
+        Group oldGroup = user.getGroup();
+        if (oldGroup == null) {
             user.setGroup(group);
             scheduleBot.queueNotifications(user);
+        } else if (oldGroup != group) {
+            user.setGroup(group);
+            scheduleBot.changeNotifications(user);
         } else
             user.setGroup(group);
         log.info(String.format("New user: %s", user));
 
-        return userService.saveOrEdit(user).toString();
+        User user1 = userService.saveOrEdit(user);
+        return "Вы успешно зарегистрировались как студент группы " + user1.getGroup().getNumber();
     }
 }

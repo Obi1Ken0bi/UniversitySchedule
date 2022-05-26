@@ -32,7 +32,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
 
     private final ExecutorService service = Executors.newFixedThreadPool(5);
 
-    private final Map<User, List<CompletableFuture>> futureMap = new HashMap<>();
+    private final Map<String, List<CompletableFuture>> futureMap = new HashMap<>();
 
     private final GroupService groupService;
     private final RegisterMessageProcessor registerMessageProcessor;
@@ -127,10 +127,10 @@ public class ScheduleBot extends TelegramLongPollingBot {
         });
     }
 
-    public void changeDelay(User user) {
+    public void changeNotifications(User user) {
 
-        var completableFutures = futureMap.get(user);
-        if(completableFutures!=null) {
+        var completableFutures = futureMap.get(user.getChatId());
+        if (completableFutures != null) {
             for (var future : completableFutures) {
                 future.cancel(true);
             }
@@ -155,9 +155,9 @@ public class ScheduleBot extends TelegramLongPollingBot {
             Executor afterDelay = CompletableFuture.delayedExecutor(delay, TimeUnit.MINUTES, service);
             CompletableFuture<Void> completableFuture =
                     CompletableFuture.runAsync(() -> sendMessage(user.getChatId(), pairDto.toString()), afterDelay);
-            var futureList = futureMap.getOrDefault(user, new ArrayList<>());
+            var futureList = futureMap.getOrDefault(user.getChatId(), new ArrayList<>());
             futureList.add(completableFuture);
-            futureMap.put(user, futureList);
+            futureMap.put(user.getChatId(), futureList);
             completableFuture.thenRun(() -> log.info("message sent"));
         }
     }
