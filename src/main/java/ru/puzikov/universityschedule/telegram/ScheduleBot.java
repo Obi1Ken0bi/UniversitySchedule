@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.puzikov.universityschedule.dto.PairDto;
 import ru.puzikov.universityschedule.misc.TelegramPropertiesReader;
+import ru.puzikov.universityschedule.persistence.model.Day;
 import ru.puzikov.universityschedule.persistence.model.Pair;
 import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.service.GroupService;
@@ -141,7 +142,11 @@ public class ScheduleBot extends TelegramLongPollingBot {
     @Transactional
     public void queueNotifications(User user) {
         log.info(String.valueOf(user));
-        Stream<Pair> pairStream = groupService.getPairsForDay(user.getGroup().getNumber(), LocalDate.now().getDayOfWeek().getValue())
+        Day pairsForDay = groupService.getPairsForDay(user.getGroup().getNumber(), LocalDate.now().getDayOfWeek().getValue());
+        if (pairsForDay == null) {
+            return;
+        }
+        Stream<Pair> pairStream = pairsForDay
                 .getPairs()
                 .stream()
                 .sorted(Comparator.comparingInt(d -> d.getTime().getHour()));
