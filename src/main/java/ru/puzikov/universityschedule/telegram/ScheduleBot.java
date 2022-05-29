@@ -32,7 +32,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
 
     private final ExecutorService service = Executors.newFixedThreadPool(5);
 
-    private final Map<String, List<CompletableFuture>> futureMap = new HashMap<>();
+    private final ConcurrentMap<String, List<CompletableFuture>> futureMap = new ConcurrentHashMap<>();
 
     private final GroupService groupService;
     private final RegisterMessageProcessor registerMessageProcessor;
