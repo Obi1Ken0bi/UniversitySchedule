@@ -3,6 +3,7 @@ package ru.puzikov.universityschedule.telegram.message;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.puzikov.universityschedule.exception.GroupNotFoundException;
 import ru.puzikov.universityschedule.persistence.model.Group;
 import ru.puzikov.universityschedule.persistence.model.User;
 import ru.puzikov.universityschedule.persistence.service.GroupService;
@@ -31,7 +32,10 @@ public class RegisterMessageProcessor implements MessageProcessor {
     }
 
     private String registerUser(String groupId, String chatId) {
-        Group group = groupService.findByNumber(Integer.parseInt(groupId));
+        Group group;
+        try {
+            group = groupService.findByNumber(Integer.parseInt(groupId));
+
 
 
         User user = userService.findByChatId(chatId);
@@ -48,5 +52,8 @@ public class RegisterMessageProcessor implements MessageProcessor {
 
         User user1 = userService.saveOrEdit(user);
         return "Вы успешно зарегистрировались как студент группы " + user1.getGroup().getNumber();
+        } catch (GroupNotFoundException e) {
+            return "Группа не найдена";
+        }
     }
 }

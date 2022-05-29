@@ -37,8 +37,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
 
-    public Group findByNumber(Integer number) {
-        return repository.findByNumber(number).orElseThrow(RuntimeException::new);
+    public Group findByNumber(Integer number) throws GroupNotFoundException {
+        return repository.findByNumber(number).orElseThrow(GroupNotFoundException::new);
     }
 
     @Override

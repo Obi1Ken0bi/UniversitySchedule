@@ -11,7 +11,7 @@ public interface GroupService {
     Group saveOrGet(Group group);
 
     @Transactional
-    Group findByNumber(Integer number);
+    Group findByNumber(Integer number) throws GroupNotFoundException;
 
     Day getPairsForDay(int groupNumber, int k);
 

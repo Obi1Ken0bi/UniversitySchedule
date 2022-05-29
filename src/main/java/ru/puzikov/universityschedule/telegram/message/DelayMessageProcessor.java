@@ -20,10 +20,15 @@ public class DelayMessageProcessor implements MessageProcessor {
 
     @Override
     public String execute(String message, String chatId) {
+        try {
 
-        userService.changeDelay(chatId, Integer.parseInt(message));
-        User user = userService.findByChatId(chatId);
-        scheduleBot.changeNotifications(user);
-        return "Задержка изменена";
+
+            userService.changeDelay(chatId, Integer.parseInt(message));
+            User user = userService.findByChatId(chatId);
+            scheduleBot.changeNotifications(user);
+            return "Задержка изменена";
+        }catch (NumberFormatException e){
+            return "Пожалуйста введите корректную задержку";
+        }
     }
 }
