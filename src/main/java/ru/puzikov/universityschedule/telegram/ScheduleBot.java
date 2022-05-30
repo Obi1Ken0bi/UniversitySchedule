@@ -78,6 +78,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
         sendMessage.setText(message);
         try {
             execute(sendMessage);
+            log.info("Message {} to {}",message,chatId);
         } catch (TelegramApiException e) {
             log.error(e.getMessage());
         }
@@ -122,7 +123,7 @@ public class ScheduleBot extends TelegramLongPollingBot {
     public void notifyUsers() {
         userService.findAll().forEach(user -> {
             queueNotifications(user);
-            log.info("scheduling worked");
+            log.info("scheduling for user "+user.toString()+" worked");
 
 
         });
@@ -160,11 +161,15 @@ public class ScheduleBot extends TelegramLongPollingBot {
             Executor afterDelay = CompletableFuture.delayedExecutor(delay, TimeUnit.MINUTES, service);
             CompletableFuture<Void> completableFuture =
                     CompletableFuture.runAsync(() -> sendMessage(user.getChatId(), pairDto.toString()), afterDelay);
-            var futureList = futureMap.getOrDefault(user.getChatId(), new ArrayList<>());
-            futureList.add(completableFuture);
-            futureMap.put(user.getChatId(), futureList);
-            completableFuture.thenRun(() -> log.info("message sent"));
+            putFutureInMap(user, completableFuture);
         }
+    }
+
+    private void putFutureInMap(User user, CompletableFuture<Void> completableFuture) {
+        var futureList = futureMap.getOrDefault(user.getChatId(), new ArrayList<>());
+        futureList.add(completableFuture);
+        futureMap.put(user.getChatId(), futureList);
+        completableFuture.thenRun(() -> log.info("message sent"));
     }
 
 }
