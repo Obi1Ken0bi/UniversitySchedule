@@ -34,24 +34,30 @@ public class RegisterMessageProcessor implements MessageProcessor {
     private String registerUser(String groupId, String chatId) {
         Group group;
         try {
-            group = groupService.findByNumber(Integer.parseInt(groupId));
+            User user = userService.findByChatId(chatId);
+            int numberOfGroupFromInput = Integer.parseInt(groupId);
 
 
 
-        User user = userService.findByChatId(chatId);
+
         Group oldGroup = user.getGroup();
         if (oldGroup == null) {
+            group = groupService.findByNumber(numberOfGroupFromInput);
             user.setGroup(group);
+            user = userService.saveOrEdit(user);
             scheduleBot.queueNotifications(user);
-        } else if (oldGroup.getNumber() != group.getNumber()) {
-            user.setGroup(group);
-            scheduleBot.changeNotifications(user);
-        } else
-            user.setGroup(group);
-        log.info(String.format("New user: %s", user));
+            log.info(String.format("new user: %s", user));
 
-        User user1 = userService.saveOrEdit(user);
-        return "Вы успешно зарегистрировались как студент группы " + user1.getGroup().getNumber();
+        } else if (oldGroup.getNumber() != numberOfGroupFromInput) {
+            group = groupService.findByNumber(numberOfGroupFromInput);
+            user.setGroup(group);
+            user = userService.saveOrEdit(user);
+            scheduleBot.changeNotifications(user);
+            log.info(String.format("user changed group: %s", user));
+        }else
+        log.info(String.format("user not changed: %s", user));
+
+        return "Вы успешно зарегистрировались как студент группы " + user.getGroup().getNumber();
         } catch (GroupNotFoundException e) {
             return "Группа не найдена";
         }
