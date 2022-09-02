@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -62,7 +63,7 @@ public class Pair {
     }
 
     public Lesson getLesson() {
-        LocalDateTime upperWeekDate = LocalDateTime.of(2022, 5, 2, 0, 5);
+        LocalDateTime upperWeekDate = LocalDateTime.of(LocalDate.now().getYear(), 9, 1, 0, 5);
         LocalDateTime now = LocalDateTime.now();
         Lesson lesson;
         if (!isWeekDependent()) {
