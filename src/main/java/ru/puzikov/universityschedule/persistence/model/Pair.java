@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Slf4j
 public class Pair {
     @ManyToMany(mappedBy = "pairs")
     @JsonIgnore
@@ -66,12 +67,17 @@ public class Pair {
         LocalDateTime upperWeekDate = LocalDateTime.of(LocalDate.now().getYear(), 8, 29, 0, 5);
         LocalDateTime now = LocalDateTime.now();
         Lesson lesson;
+        log.info(isWeekDependent());
         if (!isWeekDependent()) {
             lesson = getUpperLesson();
-        } else if ((Duration.between(upperWeekDate, now).toDays() / 7) % 2 == 0)
+        } else {
+            Integer daysBetween = (Duration.between(upperWeekDate, now).toDays();
+            log.info(daysBetween);
+            if (daysBetween % 2 == 0)
             lesson = getUpperLesson();
         else
             lesson = getDownLesson();
+        }
         return lesson;
     }
 
