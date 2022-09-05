@@ -155,7 +155,8 @@ public class ScheduleBot extends TelegramLongPollingBot {
         for (Pair pair : pairs) {
             log.info(pair.getTime().toString());
             PairDto pairDto = new PairDto(pair.getLesson(), pair.getTime());
-            int delay = pairDto.minutesToPair() - user.getDelay();
+            Integer delay = pairDto.minutesToPair() - user.getDelay();
+            log.info(delay.toString());
             if (delay < 0 && pairDto.minutesToPair() < 0)
                 continue;
             delay = Math.max(delay, 0);
