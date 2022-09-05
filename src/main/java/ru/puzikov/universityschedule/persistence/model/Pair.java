@@ -68,12 +68,12 @@ public class Pair {
         LocalDateTime upperWeekDate = LocalDateTime.of(LocalDate.now().getYear(), 8, 29, 0, 5);
         LocalDateTime now = LocalDateTime.now();
         Lesson lesson;
-        log.info(isWeekDependent());
+        log.info(isWeekDependent()? "week dependent": "week independent");
         if (!isWeekDependent()) {
             lesson = getUpperLesson();
         } else {
-            Integer daysBetween = Duration.between(upperWeekDate, now).toDays();
-            log.info(daysBetween);
+            Long daysBetween = Duration.between(upperWeekDate, now).toDays();
+            log.info(daysBetween.toString());
             if (daysBetween % 2 == 0)
             lesson = getUpperLesson();
         else
