@@ -19,7 +19,7 @@ import lombok.extern.slf4j.*;
 @Builder
 @Slf4j
 public class Pair {
-    @ManyToMany(mappedBy = "pairs")
+    @ManyToMany(mappedBy = "pairs", cascade = CascadeType.REMOVE)
     @JsonIgnore
     List<Day> days;
     @Id
@@ -72,12 +72,13 @@ public class Pair {
         if (!isWeekDependent()) {
             lesson = getUpperLesson();
         } else {
-            Long daysBetween = Duration.between(upperWeekDate, now).toDays() / 7L;
-            log.info(daysBetween.toString());
+            long daysBetween = Duration.between(upperWeekDate, now).toDays() / 7L;
+            log.info(Long.toString(daysBetween));
             if (daysBetween % 2 == 0)
             lesson = getUpperLesson();
-        else
-            lesson = getDownLesson();
+        else {
+                lesson = getDownLesson();
+            }
         }
         return lesson;
     }

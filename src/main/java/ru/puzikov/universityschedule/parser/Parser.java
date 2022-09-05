@@ -84,6 +84,8 @@ public class Parser {
         lesson = lessonService.saveOrGet(lesson);
         if (weekType.equals("")) {
             return new Pair(lesson, localTime);
+        } else if (weekType.equals("Нижняя неделя")) {
+            return new Pair(null, lesson, localTime);
         }
         return new Pair(lesson, null, localTime);
     }
@@ -157,6 +159,11 @@ public class Parser {
             Pair nextPair = parsePair(pairElems.get(i + 1));
             if (pair.getTime().equals(nextPair.getTime())) {
                 pair.setDownLesson(nextPair.getUpperLesson());
+                if(pair.getUpperLesson() == null){
+                    pair.setUpperLesson(nextPair.getUpperLesson());
+                }else{
+                    pair.setDownLesson(nextPair.getDownLesson());
+                }
                 i++;
             } else {
                 if (i + 1 == pairElems.size() - 1) {

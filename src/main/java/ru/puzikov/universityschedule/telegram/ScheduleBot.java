@@ -153,11 +153,10 @@ public class ScheduleBot extends TelegramLongPollingBot {
                 .sorted(Comparator.comparingInt(d -> d.getTime().getHour()));
         List<Pair> pairs = pairStream.collect(Collectors.toList());
         for (Pair pair : pairs) {
-            log.info(pair.getTime().toString());
+            if(pair.getLesson() == null)
+                continue;
             PairDto pairDto = new PairDto(pair.getLesson(), pair.getTime());
-            Integer delay = pairDto.minutesToPair() - user.getDelay();
-            log.info("delay: " +delay.toString());
-            log.info("minutes to pair: "+pairDto.minutesToPair());
+            int delay = pairDto.minutesToPair() - user.getDelay();
             if (delay < 0 && pairDto.minutesToPair() < 0)
                 continue;
             delay = Math.max(delay, 0);
