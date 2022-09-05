@@ -72,7 +72,7 @@ public class Pair {
         if (!isWeekDependent()) {
             lesson = getUpperLesson();
         } else {
-            Long daysBetween = Duration.between(upperWeekDate, now).toDays();
+            Long daysBetween = Duration.between(upperWeekDate, now).toDays() / 7L;
             log.info(daysBetween.toString());
             if (daysBetween % 2 == 0)
             lesson = getUpperLesson();
