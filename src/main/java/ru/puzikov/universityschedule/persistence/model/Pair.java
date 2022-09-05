@@ -63,7 +63,7 @@ public class Pair {
     }
 
     public Lesson getLesson() {
-        LocalDateTime upperWeekDate = LocalDateTime.of(LocalDate.now().getYear(), 9, 1, 0, 5);
+        LocalDateTime upperWeekDate = LocalDateTime.of(LocalDate.now().getYear(), 8, 29, 0, 5);
         LocalDateTime now = LocalDateTime.now();
         Lesson lesson;
         if (!isWeekDependent()) {
