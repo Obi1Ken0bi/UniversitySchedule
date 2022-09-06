@@ -21,7 +21,7 @@ public class UniversityScheduleApplication {
     @PostConstruct
     public void init() {
         log.info(new Date().toString());
-        TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")));
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow"))); //amogus
         log.info(new Date().toString());
     }
 
